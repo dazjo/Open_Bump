@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import binascii
+import hashlib
 import os
 import struct
 import sys
@@ -37,7 +38,7 @@ def generate_signature(image_hash):
 
 def bumped(image_data):
     sig_magic = "41a9e467744d1d1ba429f2ecea655279"
-    return image_data[-1024:].startswith(sig_magic)
+    return binascii.hexlify(image_data[-1024:]).startswith(sig_magic)
 
 
 def pair_reverse(s):
@@ -60,9 +61,9 @@ def get_size_from_kernel(f_image, page_size, seek_size):
 def pad_image(image_name):
     page_size = get_page_size(image_name)
     image_size = os.path.getsize(image_name)
-    num_pages = in_image_size / page_size
+    num_pages = image_size / page_size
 
-    f_image = open(in_image, 'a+b')
+    f_image = open(image_name, 'a+b')
 
     paged_kernel_size = get_size_from_kernel(f_image, page_size, 8)
     paged_ramdisk_size = get_size_from_kernel(f_image, page_size, 16)
@@ -114,12 +115,13 @@ def main(in_image, out_image):
     d_in_image = open(in_image, 'rb').read()
     open(out_image, 'wb').write(d_in_image)
     if bumped(d_in_image):
+        print("Image already bumped")
         finish(out_image)
     pad_image(out_image)
     sha1sum = get_sha1(out_image)
     signature = generate_signature(sha1sum)
     with open(out_image, 'a+b') as f_out_image:
-        f_out_image.write(binascii.unhexlify(signature))
+        f_out_image.write(signature)
     finish(out_image)
 
 
