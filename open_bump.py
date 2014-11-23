@@ -16,9 +16,10 @@ if POC:
 
 
 usage = """\
-Usage: open_bump.py "<image_file>" "<output_image>"
+Usage: open_bump.py [-ha] "<image_file>" "<output_image>"
   image_file        - <required> path to the image file to bump
-  output_image      - <optional> path to output the bumped file to (defaults to <image_file>_bumped.img\
+  output_image      - <optional> path to output the bumped file to (defaults to <image_file>_bumped.img
+  -a/--apend image_file  - <required> if in append mode, the <image_file> is appended rather than <output_file> being generated\
 """
 
 lg_key = "b5e7fc2010c4a82d6d597ba040816da7832e0a5679c81475a0438447b711140f"
