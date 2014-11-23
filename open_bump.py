@@ -23,7 +23,8 @@ Usage: open_bump.py "<image_file>" "<output_image>"
 
 lg_key = "b5e7fc2010c4a82d6d597ba040816da7832e0a5679c81475a0438447b711140f"
 lg_iv = "$ecure-W@|lp@per"
-lg_magic = "696e6877612e77651000000047116667"
+lg_magic = "41a9e467744d1d1ba429f2ecea655279"
+lg_dec_magic = "696e6877612e77651000000047116667"
 
 
 def generate_signature(image_hash):
