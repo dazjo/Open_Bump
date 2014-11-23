@@ -3,11 +3,16 @@
 from __future__ import print_function
 
 import binascii
-import hashlib
 import os
 import struct
 import sys
-from Crypto.Cipher import AES
+
+# Proof of Concept
+POC = False
+
+if POC:
+    from Crypto.Cipher import AES
+    import hashlib
 
 
 usage = """\
@@ -38,7 +43,8 @@ def generate_signature(image_hash):
 
 def bumped(image_data):
     sig_magic = "41a9e467744d1d1ba429f2ecea655279"
-    return binascii.hexlify(image_data[-1024:]).startswith(sig_magic)
+    d = binascii.hexlify(image_data[-1024:])
+    return d.endswith(sig_magic) or d.startswith(sig_magic)
 
 
 def pair_reverse(s):
@@ -118,10 +124,13 @@ def main(in_image, out_image):
         print("Image already bumped")
         finish(out_image)
     pad_image(out_image)
-    sha1sum = get_sha1(out_image)
-    signature = generate_signature(sha1sum)
+    if POC:
+        sha1sum = get_sha1(out_image)
+        magic = generate_signature(sha1sum)
+    else:
+        magic = binascii.unhexlify("41a9e467744d1d1ba429f2ecea655279")
     with open(out_image, 'a+b') as f_out_image:
-        f_out_image.write(signature)
+        f_out_image.write(magic)
     finish(out_image)
 
 
