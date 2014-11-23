@@ -21,15 +21,19 @@ Usage: open_bump.py "<image_file>" "<output_image>"
   output_image      - <optional> path to output the bumped file to (defaults to <image_file>_bumped.img\
 """
 
+lg_key = "b5e7fc2010c4a82d6d597ba040816da7832e0a5679c81475a0438447b711140f"
+lg_iv = "$ecure-W@|lp@per"
+lg_magic = "696e6877612e77651000000047116667"
+
 
 def generate_signature(image_hash):
     # the iv and key were extracted from the lg g2 aboot.img. I can explain how to find it on request.
-    iv = "$ecure-W@|lp@per"
-    key = binascii.unhexlify("b5e7fc2010c4a82d6d597ba040816da7832e0a5679c81475a0438447b711140f")
+    iv = lg_iv
+    key = binascii.unhexlify(lg_key)
     # this "magic" number was found after decrypting the bumped images
     # Without codefire, this would not have been possible as I can find no reference in
     # the images of the g2 or the g3
-    magic = binascii.unhexlify("696e6877612e77651000000047116667")
+    magic = binascii.unhexlify(lg_magic)
     image_hash = binascii.unhexlify(image_hash)  # insert your hash here
     # the structure of the signature in bump starts with a magic number, then seemingly random
     # bytes. 2 zeros follow, then the hash of the image, then 6 zeros, then 512 bytes of random data again
@@ -42,9 +46,8 @@ def generate_signature(image_hash):
 
 
 def bumped(image_data):
-    sig_magic = "41a9e467744d1d1ba429f2ecea655279"
     d = binascii.hexlify(image_data[-1024:])
-    return d.endswith(sig_magic) or d.startswith(sig_magic)
+    return d.endswith(lg_magic) or d.startswith(lg_magic)
 
 
 def pair_reverse(s):
@@ -128,7 +131,7 @@ def main(in_image, out_image):
         sha1sum = get_sha1(out_image)
         magic = generate_signature(sha1sum)
     else:
-        magic = binascii.unhexlify("41a9e467744d1d1ba429f2ecea655279")
+        magic = binascii.unhexlify(lg_magic)
     with open(out_image, 'a+b') as f_out_image:
         f_out_image.write(magic)
     finish(out_image)
