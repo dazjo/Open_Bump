@@ -142,18 +142,24 @@ def cli():
     if len(sys.argv) < 2:
         print(usage)
         sys.exit(1)
-    if sys.argv[1] in ["-h", "--help", "help"]:
+    if sys.argv[1] in ["-h", "--help"]:
         print(usage)
         sys.exit(0)
-    image_name = sys.argv[1]
+    if sys.argv[1] in ["-a", "--append"]:
+        if len(sys.argv) < 3:
+            print(usage)
+            sys.exit(1)
+        image_name = out_image = sys.argv[2]
+    else:
+        image_name = sys.argv[1]
+        if len(sys.argv) >= 3:
+            out_image = sys.argv[2]
+        else:
+            out_split = os.path.splitext(image_name)
+            out_image = out_split[0] + "_bumped" + out_split[1]
     if not os.path.isfile(image_name):
         print("file not found: %s" % image_name)
         sys.exit(1)
-    if len(sys.argv) >= 3:
-        out_image = sys.argv[2]
-    else:
-        out_split = os.path.splitext(image_name)
-        out_image = out_split[0] + "_bumped" + out_split[1]
     main(image_name, out_image)
 
 
